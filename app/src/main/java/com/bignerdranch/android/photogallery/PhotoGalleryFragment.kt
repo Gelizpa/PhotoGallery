@@ -1,11 +1,15 @@
 package com.bignerdranch.android.photogallery
 
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
@@ -47,23 +51,31 @@ class PhotoGalleryFragment : Fragment() {
                 photoRecyclerView.adapter = PhotoAdapter(galleryItems)//адаптер для наблюдения за доступностью и изменением данных
             })
     }
-    private class PhotoHolder(itemTextView: TextView)
-        : RecyclerView.ViewHolder(itemTextView) {
-        val bindTitle: (CharSequence) -> Unit = itemTextView::setText
+    private class PhotoHolder(private val itemImageView: ImageView)
+        : RecyclerView.ViewHolder(itemImageView) {
+        val bindDrawable: (Drawable) -> Unit = itemImageView::setImageDrawable
     }
-    private class PhotoAdapter(private val galleryItems: List<GalleryItem>)
+    private inner class PhotoAdapter(private val galleryItems: List<GalleryItem>)//inner, чтобы у PhotoAdapter появился прямой доступ к свойству layoutInflater родительской activity
         : RecyclerView.Adapter<PhotoHolder>() {
         override fun onCreateViewHolder(
             parent: ViewGroup,
             viewType: Int
         ): PhotoHolder {
-            val textView = TextView(parent.context)
-            return PhotoHolder(textView)
+            val view = layoutInflater.inflate(
+                R.layout.list_item_gallery,
+                parent,
+                false
+            ) as ImageView
+            return PhotoHolder(view)
         }
         override fun getItemCount(): Int = galleryItems.size
         override fun onBindViewHolder(holder: PhotoHolder, position: Int) {
             val galleryItem = galleryItems[position]
-            holder.bindTitle(galleryItem.title)
+   //временное изображение назначается объектом Drawable виджета ImageView
+            val placeholder: Drawable = ContextCompat.getDrawable(
+                requireContext(),
+                R.drawable.bill_up_close) ?: ColorDrawable()
+            holder.bindDrawable(placeholder)
         }
     }
     companion object {
