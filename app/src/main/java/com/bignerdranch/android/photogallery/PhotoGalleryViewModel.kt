@@ -6,6 +6,6 @@ import androidx.lifecycle.ViewModel
 class PhotoGalleryViewModel : ViewModel() {
     val galleryItemLiveData: LiveData<List<GalleryItem>>
     init {
-        galleryItemLiveData = FlickrFetchr().fetchPhotos()//Функция FlickrFetchr().fetchPhotos() запускает запрос данных фото при первом создании ViewModel.
+        galleryItemLiveData = FlickrFetchr().searchPhotos("planets")     // Запуск поискового запроса
     }
 }
