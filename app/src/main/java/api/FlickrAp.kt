@@ -1,7 +1,9 @@
 package api
 
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.GET
+import retrofit2.http.Url
 
 /*Аннотация @GET("/") в приведенном ниже коде настраивает Call на выполнение GET-запроса.
 метод flickr.interestingness.getList.«возвращает список интересных фотографий за последний день или указанную пользователем дату»
@@ -17,6 +19,8 @@ import retrofit2.http.GET
                     "&extras=url_s"//добавить URL-адрес мини-версии изображения, если таковая есть
         )
         fun fetchPhotos(): Call<FlickrResponse>//FlickrResponse для десериализации JSON-данных в ответе
+        @GET
+        fun fetchUrlBytes(@Url url: String): Call<ResponseBody>//URL-адрес,который используется для определения того, откуда загружать данные
     }// Объект Call представляет собой один веб-запрос, который вы можете выполнить.При выполнении вызова генерируется один соответствующий веб-отклик.
 
 

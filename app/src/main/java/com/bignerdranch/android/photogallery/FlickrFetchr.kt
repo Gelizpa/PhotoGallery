@@ -1,12 +1,16 @@
 package com.bignerdranch.android.photogallery
 
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.util.Log
+import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import api.FlickrApi
 import api.FlickrResponse
 import api.PhotoResponse
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -51,5 +55,13 @@ class FlickrFetchr {
             }
         })
         return responseLiveData
+    }
+  //Добавление загрузки изображения
+    @WorkerThread//@WorkerThread указывает, что эта функция должна вызываться только в фоновом потоке
+    fun fetchPhoto(url: String): Bitmap? {
+        val response: Response<ResponseBody> = flickrApi.fetchUrlBytes(url).execute()//Call.execute(),  синхронно выполняет веб-запрос
+        val bitmap = response.body()?.byteStream()?.use(BitmapFactory::decodeStream)
+        Log.i(TAG, "Decoded bitmap=$bitmap from Response=$response")
+        return bitmap
     }
 }
