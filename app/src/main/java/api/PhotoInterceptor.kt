@@ -18,8 +18,8 @@ class PhotoInterceptor : Interceptor {
             .addQueryParameter("api_key", API_KEY)                //HttpUrl.Builder создает новый запрос на основе оригинального запроса изаменяет исходный URL на новый.
             .addQueryParameter("format", "json")
             .addQueryParameter("nojsoncallback", "1")
-            .addQueryParameter("extras", "url_s")
-            .addQueryParameter("safesearch", "1")
+            .addQueryParameter("extras", "url_s")           //добавить URL-адрес мини-версии изображения, если таковая есть
+            .addQueryParameter("safesearch", "1")          // инструктирует Flickr убрать из ответа круглые скобки
             .build()
         val newRequest: Request = originalRequest.newBuilder()
             .url(newUrl)
