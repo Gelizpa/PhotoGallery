@@ -23,7 +23,7 @@ class PhotoGalleryFragment : Fragment() {
     private lateinit var photoRecyclerView: RecyclerView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val flickrLiveData: LiveData<String> = FlickrFetchr().fetchContents()
+        val flickrLiveData: LiveData<String> = FlickrFetchr().fetchPhotos()
         flickrLiveData.observe(
             this,
             Observer { responseString ->

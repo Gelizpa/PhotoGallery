@@ -15,15 +15,15 @@ class FlickrFetchr {
     private val flickrApi: FlickrApi
     init {
         val retrofit: Retrofit = Retrofit.Builder()
-            .baseUrl("https://www.flickr.com/")//Задается базовый URL для  конечной точки
+            .baseUrl("https://api.flickr.com/")//Задается базовый URL для  конечной точки
             .addConverterFactory(ScalarsConverterFactory.create())//преобразовывает ответ в строку
             .build()//возвращает экземпляр Retrofit, у которого появляются настройки, заданные с помощью объекта builder,Полуеный объект используется его для создания экземпляра  интерфейса API.
         flickrApi = retrofit.create(FlickrApi::class.java)
     }
 
-    fun fetchContents(): LiveData<String> {
+    fun fetchPhotos(): LiveData<String> {
         val responseLiveData: MutableLiveData<String> = MutableLiveData()
-        val flickrRequest: Call<String> = flickrApi.fetchContents()//ставит в очередь сетевой запрос и обертывает результат в LiveData
+        val flickrRequest: Call<String> = flickrApi.fetchPhotos()//ставит в очередь сетевой запрос и обертывает результат в LiveData
         flickrRequest.enqueue(object : Callback<String> {
             override fun onFailure(call: Call<String>, t: Throwable) {
                 Log.e(TAG, "Failed to fetch photos", t)
