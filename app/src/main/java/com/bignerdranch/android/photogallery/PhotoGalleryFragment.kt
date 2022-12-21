@@ -17,6 +17,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import api.FlickrApi
+import com.squareup.picasso.Picasso
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -25,14 +26,18 @@ import retrofit2.converter.scalars.ScalarsConverterFactory
 
 private const val TAG = "PhotoGalleryFragment"
 private lateinit var photoGalleryViewModel: PhotoGalleryViewModel
+/*private lateinit var thumbnailDownloader: ThumbnailDownloader*/
+
 
 class PhotoGalleryFragment : Fragment() {
     private lateinit var photoRecyclerView: RecyclerView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        retainInstance = true//сохранение фрагмента
         photoGalleryViewModel =
             ViewModelProviders.of(this).get(PhotoGalleryViewModel::class.java)
-
+       /* thumbnailDownloader = ThumbnailDownloader()
+        lifecycle.addObserver(thumbnailDownloader)*/
     }
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -51,11 +56,22 @@ class PhotoGalleryFragment : Fragment() {
                 photoRecyclerView.adapter = PhotoAdapter(galleryItems)//адаптер для наблюдения за доступностью и изменением данных
             })
     }
-    private class PhotoHolder(private val itemImageView: ImageView)
+
+    /*override fun onDestroy() {
+        super.onDestroy()
+        lifecycle.removeObserver(thumbnailDownloader)
+    }*/
+
+    private class PhotoHolder(itemImageView: ImageView)
+        : RecyclerView.ViewHolder(itemImageView) {
+        val bindImageView: (ImageView) = itemImageView}
+
+
+   /* private class PhotoHolder(private val itemImageView: ImageView)
         : RecyclerView.ViewHolder(itemImageView) {
         val bindDrawable: (Drawable) -> Unit = itemImageView::setImageDrawable
-    }
-    private inner class PhotoAdapter(private val galleryItems: List<GalleryItem>)//inner, чтобы у PhotoAdapter появился прямой доступ к свойству layoutInflater родительской activity
+    }*/
+    /*private inner class PhotoAdapter(private val galleryItems: List<GalleryItem>)//inner, чтобы у PhotoAdapter появился прямой доступ к свойству layoutInflater родительской activity
         : RecyclerView.Adapter<PhotoHolder>() {
         override fun onCreateViewHolder(
             parent: ViewGroup,
@@ -67,16 +83,40 @@ class PhotoGalleryFragment : Fragment() {
                 false
             ) as ImageView
             return PhotoHolder(view)
-        }
-        override fun getItemCount(): Int = galleryItems.size
+        }*/
+
+
+
+    //выдает PhotoHolder из галереи(заполняет файл list_item_gallery.xml и передаёт его конструктору PhotoHolder
+   private inner class PhotoAdapter(private val galleryItems: List<GalleryItem>)
+       : RecyclerView.Adapter<PhotoHolder>() {
+
+       override fun onCreateViewHolder(
+           parent: ViewGroup,
+           viewType: Int
+       ): PhotoHolder {
+           val view = layoutInflater.inflate(
+               R.layout.list_item_gallery,
+               parent,
+               false
+           ) as ImageView
+           return PhotoHolder(view)
+       }
+
+
+
+       override fun getItemCount(): Int = galleryItems.size
         override fun onBindViewHolder(holder: PhotoHolder, position: Int) {
+            lateinit var itemImageView: ImageView
             val galleryItem = galleryItems[position]
-   //временное изображение назначается объектом Drawable виджета ImageView
-            val placeholder: Drawable = ContextCompat.getDrawable(
-                requireContext(),
-                R.drawable.bill_up_close) ?: ColorDrawable()
-            holder.bindDrawable(placeholder)
+
+            //
+            Picasso.get()
+                .load(galleryItem.url)
+                .placeholder(R.drawable.bill_up_close)
+                .into(holder.bindImageView)
         }
+
     }
     companion object {
         fun newInstance() = PhotoGalleryFragment()
