@@ -6,6 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import api.FlickrApi
@@ -21,25 +23,13 @@ class PhotoGalleryFragment : Fragment() {
     private lateinit var photoRecyclerView: RecyclerView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val retrofit: Retrofit = Retrofit.Builder()
-            .baseUrl("https://www.flickr.com/")//Задается базовый URL для  конечной точки
-            .addConverterFactory(ScalarsConverterFactory.create())//преобразовывает ответ в строку
-            .build()//возвращает экземпляр Retrofit, у которого появляются настройки, заданные с помощью объекта builder,Полуеный объект используется его для создания экземпляра  интерфейса API.
-        val flickrApi: FlickrApi = retrofit.create(FlickrApi::class.java)
-        val flickrHomePageRequest: Call<String> = flickrApi.fetchContents()//возвращает объект Call<String>, представляющий собой веб-запрос
-
-        flickrHomePageRequest.enqueue(object : Callback<String> {
-            override fun onFailure(call: Call<String>, t: Throwable) {
-                Log.e(TAG, "Failed to fetch photos", t)
-            }
-            override fun onResponse(
-                call: Call<String>,
-                response: Response<String>
-            ) {
-                Log.d(TAG, "Response received: ${response.body()}")
-            }
-        })//Функция Call.enqueue(...) выполняет веб-запрос, находящийся в объекте Call.
-    }
+        val flickrLiveData: LiveData<String> = FlickrFetchr().fetchContents()
+        flickrLiveData.observe(
+            this,
+            Observer { responseString ->
+                Log.d(TAG, "Response received: $responseString")
+            })
+    }// FlickrFetchr —это своего рода простой репозиторий
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
